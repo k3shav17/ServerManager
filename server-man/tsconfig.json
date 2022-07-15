@@ -22,7 +22,8 @@
       "es2020",
       "dom"
     ],
-    "strictNullChecks": false
+    "strictNullChecks": false,
+    "strictFunctionTypes": false
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
