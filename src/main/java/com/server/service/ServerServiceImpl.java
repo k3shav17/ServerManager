@@ -1,11 +1,13 @@
 package com.server.service;
 
+import static org.springframework.data.domain.PageRequest.of;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.List;
 import java.util.Random;
 
-import org.springframework.data.domain.PageRequest;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -23,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ServerServiceImpl implements ServerService {
 
+	@Autowired
 	private ServerRepository serverRepository;
 
 	@Override
@@ -35,7 +38,7 @@ public class ServerServiceImpl implements ServerService {
 	@Override
 	public List<Server> list(int limit) {
 		log.info("Fetching servers ");
-		return serverRepository.findAll(PageRequest.of(0, limit)).toList();
+		return serverRepository.findAll(of(0, limit)).toList();
 	}
 
 	@Override
