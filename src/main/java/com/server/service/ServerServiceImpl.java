@@ -72,6 +72,6 @@ public class ServerServiceImpl implements ServerService {
 
 		String[] images = { "server1.png", "server2.png", "server3.png" };
 		return ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/server/image/" + images[new Random().nextInt(3)]).toUriString();
+				.path("/server/" + images[new Random().nextInt(3)]).toUriString();
 	}
 }
