@@ -9,7 +9,7 @@ import { Server } from '../interface/server';
   providedIn: 'root',
 })
 export class ServerService {
-  private readonly apiUrl: string = '';
+  private readonly apiUrl = 'http://localhost:8080';
 
   constructor(private http: HttpClient) {}
 
@@ -40,10 +40,11 @@ export class ServerService {
     );
 
   filter$ = (status: Status, response: CustomResponse) =>
-    <Observable<CustomResponse>>new Observable<CustomResponse>((subscriber) => {
-      console.log(response);
-      subscriber.next(
-        status === Status.ALL
+    <Observable<CustomResponse>> new Observable<CustomResponse>(
+      (subscriber) => {
+        console.log(response);
+        subscriber.next(
+          status === Status.ALL
           ? { ...response, message: `Servers filtered by ${status}status` }
           : {
               ...response,
