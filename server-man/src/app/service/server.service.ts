@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, Subscriber, tap, throwError } from 'rxjs';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { Status } from '../enum/status.enum';
 import { CustomResponse } from '../interface/custom-response';
 import { Server } from '../interface/server';
@@ -40,18 +40,12 @@ export class ServerService {
     );
 
   filter$ = (status: Status, response: CustomResponse) =>
-    <Observable<CustomResponse>> new Observable<CustomResponse>(
-      (subscriber) => {
-        console.log(response);
-        subscriber.next(
-          status === Status.ALL
+    <Observable<CustomResponse>>new Observable<CustomResponse>((suscriber) => {
+      console.log(response);
+      suscriber.next(
+        status === Status.ALL
           ? { ...response, message: `Servers filtered by ${status}status` }
-          : {
-              ...response,
-              message:
-                response.data.servers.filter(
-                  (server) => server.status === status
-                ).length > 0
+          : { ...response, message: response.data.servers.filter((server) => server.status === status).length > 0
                   ? `Servers filtered by ${
                       status === Status.SERVER_UP ? 'SERVER_UP' : 'SERVER_DOWN'
                     } status`
@@ -63,7 +57,7 @@ export class ServerService {
               },
             }
       );
-      subscriber.complete();
+      suscriber.complete();
     }).pipe(tap(console.log), catchError(this.handleError));
 
   private handleError(error: HttpErrorResponse): Observable<never> {

@@ -21,13 +21,13 @@ public class ServerManagerApplication {
 		SpringApplication.run(ServerManagerApplication.class, args);
 	}
 
-	@Bean
-	CommandLineRunner run(ServerRepository serverRepository) {
-		return args -> {
-			serverRepository.save(new Server(null, "192.168.1.39", "EndeavourOS", "16 GB", "Personal PC",
-					"http://localhost:8080/server/server1.png", Status.SERVER_UP));
-		};
-	}
+//	@Bean
+//	CommandLineRunner run(ServerRepository serverRepository) {
+//		return args -> {
+//			serverRepository.save(new Server(null, "192.168.1.39", "EndeavourOS", "16 GB", "Personal PC",
+//					"http://localhost:8080/server/server1.png", Status.SERVER_UP));
+//		};
+//	}
 
 	@Bean
 	CorsFilter corsFilter() {
