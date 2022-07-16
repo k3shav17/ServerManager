@@ -35,13 +35,14 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.appState$ = this.serverService.server$.pipe(
       map((response) => {
+        console.log(response)
         this.dataSubject.next(response);
         return {
           dataState: DataState.LOADED,
-          appData: response,
-          // // {
-          // //   ...response,
-          // //   data: { servers: response.data.servers.reverse() },
+          appData: response.data.servers
+          //  {
+          //   ...response,
+          //   data: { servers: response.data.servers.reverse() },
           // },
         };
       }),
@@ -144,14 +145,14 @@ export class AppComponent implements OnInit {
 
   printReport() {
     window.print();
- //   let dataType = 'application/vnd.ms-excel.sheet.macroEnabled.12';
- //   let tableSelect = document.getElementById('servers');
- //   let tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
- //   let downloadLink = document.createElement('a');
- //   document.body.appendChild(downloadLink);
- //   downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
- //   downloadLink.download = 'Server-Report.xls';
- //   downloadLink.click();
- //   document.body.removeChild(downloadLink);
+    //   let dataType = 'application/vnd.ms-excel.sheet.macroEnabled.12';
+    //   let tableSelect = document.getElementById('servers');
+    //   let tableHTML = tableSelect.outerHTML.replace(/ /g, '%20');
+    //   let downloadLink = document.createElement('a');
+    //   document.body.appendChild(downloadLink);
+    //   downloadLink.href = 'data:' + dataType + ', ' + tableHTML;
+    //   downloadLink.download = 'Server-Report.xls';
+    //   downloadLink.click();
+    //   document.body.removeChild(downloadLink);
   }
 }
