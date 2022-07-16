@@ -4,7 +4,9 @@ import static org.springframework.data.domain.PageRequest.of;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.List;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.util.Collection;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ public class ServerServiceImpl implements ServerService {
 	}
 
 	@Override
-	public List<Server> list(int limit) {
+	public Collection<Server> list(int limit) {
 		log.info("Fetching servers ");
 		return serverRepository.findAll(of(0, limit)).toList();
 	}
@@ -74,7 +76,18 @@ public class ServerServiceImpl implements ServerService {
 	private String setServerImagerURL() {
 
 		String[] images = { "server1.png", "server2.png", "server3.png" };
-		return ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/server/" + images[new Random().nextInt(3)]).toUriString();
+		return ServletUriComponentsBuilder.fromCurrentContextPath().path("/server/" + images[new Random().nextInt(3)])
+				.toUriString();
+	}
+
+	private boolean isReachable(String ipAddress, int port, int timeOut) {
+		try {
+			try (Socket socket = new Socket()) {
+				socket.connect(new InetSocketAddress(ipAddress, port), timeOut);
+			}
+			return true;
+		} catch (IOException exception) {
+			return false;
+		}
 	}
 }

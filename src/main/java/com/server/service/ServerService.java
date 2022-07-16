@@ -1,7 +1,7 @@
 package com.server.service;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import com.server.model.Server;
 
@@ -10,7 +10,7 @@ public interface ServerService {
 	
 	Server ping(String ipAddress) throws IOException;
 
-	List<Server> list(int limit);
+	Collection<Server> list(int limit);
 
 	Server get(Long id);
 
