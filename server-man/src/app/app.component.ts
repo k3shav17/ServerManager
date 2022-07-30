@@ -14,7 +14,7 @@ import { ServerService } from './service/server.service';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AppComponent implements OnInit {
   appState$: Observable<AppState<CustomResponse>>;
@@ -26,77 +26,104 @@ export class AppComponent implements OnInit {
   private isLoading = new BehaviorSubject<boolean>(false);
   isLoading$ = this.isLoading.asObservable();
 
-
-  constructor(private serverService: ServerService, private notifier: NotificationService) { }
+  constructor(
+    private serverService: ServerService,
+    private notifier: NotificationService
+  ) {}
 
   ngOnInit(): void {
-    this.appState$ = this.serverService.servers$
-      .pipe(
-        map(response => {
-          this.notifier.onDefault(response.message);
-          this.dataSubject.next(response);
-          return { dataState: DataState.LOADED_STATE, appData: { ...response, data: { servers: response.data.servers } } }
-        }),
-        startWith({ dataState: DataState.LOADING_STATE }),
-        catchError((error: string) => {
-          this.notifier.onError(error);
-          console.log(error)
-          return of({ dataState: DataState.ERROR_STATE, error });
-        })
-      );
+    this.appState$ = this.serverService.servers$.pipe(
+      map((response) => {
+        console.log(response.data.server)
+        this.notifier.onDefault(response.message);
+        this.dataSubject.next(response);
+        return {
+          dataState: DataState.LOADED_STATE,
+          appData: { ...response, data: { servers: response.data.servers } },
+        };
+      }),
+      startWith({ dataState: DataState.LOADING_STATE }),
+      catchError((error: string) => {
+        this.notifier.onError(error);
+        console.log(error);
+        return of({ dataState: DataState.ERROR_STATE, error });
+      })
+    );
   }
 
   pingServer(ipAddress: string): void {
     this.filterSubject.next(ipAddress);
-    this.appState$ = this.serverService.ping$(ipAddress)
-      .pipe(
-        map(response => {
-          const index = this.dataSubject.value.data.servers.findIndex(server =>  server.id === response.data.server.id);
-          this.dataSubject.value.data.servers[index] = response.data.server;
-          this.notifier.onDefault(response.message);
-          this.filterSubject.next('');
-          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
-        }),
-        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
-        catchError((error: string) => {
-          this.filterSubject.next('');
-          this.notifier.onError(error);
-          return of({ dataState: DataState.ERROR_STATE, error });
-        })
-      );
+    this.appState$ = this.serverService.ping$(ipAddress).pipe(
+      map((response) => {
+        const index = this.dataSubject.value.data.servers.findIndex(
+          (server) => server.id === response.data.server.id
+        );
+        this.dataSubject.value.data.servers[index] = response.data.server;
+        this.notifier.onDefault(response.message);
+        this.filterSubject.next('');
+        return {
+          dataState: DataState.LOADED_STATE,
+          appData: this.dataSubject.value,
+        };
+      }),
+      startWith({
+        dataState: DataState.LOADED_STATE,
+        appData: this.dataSubject.value,
+      }),
+      catchError((error: string) => {
+        this.filterSubject.next('');
+        this.notifier.onError(error);
+        return of({ dataState: DataState.ERROR_STATE, error });
+      })
+    );
   }
 
   saveServer(serverForm: NgForm): void {
     this.isLoading.next(true);
-    this.appState$ = this.serverService.save$(serverForm.value as Server)
-      .pipe(
-        map(response => {
-          this.dataSubject.next(
-            {...response, data: { servers: [response.data.server, ...this.dataSubject.value.data.servers] } }
-          );
-          this.notifier.onDefault(response.message);
-          document.getElementById('closeModal').click();
-          this.isLoading.next(false);
-          serverForm.resetForm({ status: this.Status.SERVER_DOWN });
-          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
-        }),
-        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
-        catchError((error: string) => {
-          this.isLoading.next(false);
-          this.notifier.onError(error);
-          return of({ dataState: DataState.ERROR_STATE, error });
-        })
-      );
-}
+    this.appState$ = this.serverService.save$(serverForm.value as Server).pipe(
+      map((response) => {
+        this.dataSubject.next({
+          ...response,
+          data: {
+            servers: [
+              response.data.server,
+              ...this.dataSubject.value.data.servers,
+            ],
+          },
+        });
+        this.notifier.onDefault(response.message);
+        document.getElementById('closeModal').click();
+        this.isLoading.next(false);
+        serverForm.resetForm({ status: this.Status.SERVER_DOWN });
+        return {
+          dataState: DataState.LOADED_STATE,
+          appData: this.dataSubject.value,
+        };
+      }),
+      startWith({
+        dataState: DataState.LOADED_STATE,
+        appData: this.dataSubject.value,
+      }),
+      catchError((error: string) => {
+        this.isLoading.next(false);
+        this.notifier.onError(error);
+        return of({ dataState: DataState.ERROR_STATE, error });
+      })
+    );
+  }
 
   filterServers(status: Status): void {
-    this.appState$ = this.serverService.filter$(status, this.dataSubject.value)
+    this.appState$ = this.serverService
+      .filter$(status, this.dataSubject.value)
       .pipe(
-        map(response => {
+        map((response) => {
           this.notifier.onDefault(response.message);
           return { dataState: DataState.LOADED_STATE, appData: response };
         }),
-        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
+        startWith({
+          dataState: DataState.LOADED_STATE,
+          appData: this.dataSubject.value,
+        }),
         catchError((error: string) => {
           this.notifier.onError(error);
           return of({ dataState: DataState.ERROR_STATE, error });
@@ -105,22 +132,31 @@ export class AppComponent implements OnInit {
   }
 
   deleteServer(server: Server): void {
-    this.appState$ = this.serverService.delete$(server.id)
-      .pipe(
-        map(response => {
-          this.dataSubject.next(
-            { ...response, data: 
-              { servers: this.dataSubject.value.data.servers.filter(s => s.id !== server.id)} }
-          );
-          this.notifier.onDefault(response.message);
-          return { dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }
-        }),
-        startWith({ dataState: DataState.LOADED_STATE, appData: this.dataSubject.value }),
-        catchError((error: string) => {
-          this.notifier.onError(error);
-          return of({ dataState: DataState.ERROR_STATE, error });
-        })
-      );
+    this.appState$ = this.serverService.delete$(server.id).pipe(
+      map((response) => {
+        this.dataSubject.next({
+          ...response,
+          data: {
+            servers: this.dataSubject.value.data.servers.filter(
+              (s) => s.id !== server.id
+            ),
+          },
+        });
+        this.notifier.onDefault(response.message);
+        return {
+          dataState: DataState.LOADED_STATE,
+          appData: this.dataSubject.value,
+        };
+      }),
+      startWith({
+        dataState: DataState.LOADED_STATE,
+        appData: this.dataSubject.value,
+      }),
+      catchError((error: string) => {
+        this.notifier.onError(error);
+        return of({ dataState: DataState.ERROR_STATE, error });
+      })
+    );
   }
 
   printReport(): void {

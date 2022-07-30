@@ -2,18 +2,19 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 import { Status } from '../enum/status.enum';
 import { CustomResponse } from '../interface/custom-response';
 import { Server } from '../interface/server';
 
 @Injectable({ providedIn: 'root' })
 export class ServerService {
-  private readonly apiUrl = 'http://localhost:8080';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
-  servers$ = <Observable<CustomResponse>>
-    this.http.get<CustomResponse>(`${this.apiUrl}/server/list`)
+  servers$ = <Observable<any>>
+    this.http.get<any>(`${this.apiUrl}/server/list`)
       .pipe(
         tap(console.log),
         catchError(this.handleError)
